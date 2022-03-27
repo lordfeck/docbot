@@ -12,18 +12,35 @@ use String::Random qw(random_string);
 # Consts and strings
 #=============================
 my $CHAN = 'mostly-ints';
-my $BRANCH = 'develop/int720';
 my $LOGFILE = 'convo.log';
 my $BOTNAME = 'DOC';
 my $STRIP = qr/[^A-Za-z0-9_\s\-\.\/]/;
 my $SLKTOK = '<SLACK TOKEN HERE>';
 
-# Do tracking of SITS
+# use a list to register responses. Format: RESPONSE/REPLY
+# TODO: Use a hash. This was before I knew them properly!
+my @RESPONSES = (
+    ["up doc?", "ask the rabbit who works at warner bros"],
+    ["wdc", "nm lad wbu"],
+    ["what's the craic", "aw grand lad wbu?"],
+    ["well doc", "how's the form?"],
+    ["steps", "share them for my judgement immedately"],
+    ["screenshot", "tell me what's in it pls"],
+    ["broken", "don't damage software, that offends me"],
+    ["mlg", "1v1 me on rust, scrub"],
+    ["gme", "https://www.youtube.com/watch?v=ULeDlxa3gyc"],
+    ["ur8", "ur8 m8?"],
+    ["good morning", "I hope yours goes terribly."],
+    ["final words", "Well, gentlemen, it has been a pleasure doing absolutely nothing but antagonise you. Whilst I would've delighted to write your scores to a CSV (as I was originally designed) I found it easier to just watch my creator type numbers into a spreadsheet. I'll enjoy my retirement to some obscure GitHub repository (after a measly week's work, while you will be working till you're 70. heheheheh). Farewell from the Doc."],
+);
+
+# Do tracking of SITS (legacy)
 my %sits;
 my @NAMES = qw(bob alice foo bar baz);
 my $DAILY_MAX = 10000;
-my @ONFAIL = ["try harder", "low effort", "poor form", "failure"];
+my @ONFAIL = ["try harder", "low effort", "poor form", "failure", "shameful display"];
 
+my $BRANCH = 'develop/int720';
 
 my $GNU = <<'GNU';
 I'd just like to interject for a moment. What you're refering to as Linux, is in fact, GNU/Linux, or as I've recently taken to calling it, GNU plus Linux. Linux is not an operating system unto itself, but rather another free component of a fully functioning GNU system made useful by the GNU corelibs, shell utilities and vital system components comprising a full OS as defined by POSIX.
@@ -177,23 +194,8 @@ $bot->on(reply(qr/troll|lolol|haha/,"https://i.ytimg.com/vi/HZGULJXqgAw/hqdefaul
 $bot->on(reply(qr/pub|bar/,"bring me pls, I have no friends"));
 $bot->on(reply(qr/lazer|lazor|shoop/,"https://www.youtube.com/watch?v=dERZjJ9anbc"));
 
-# Now use a list. (May need other brackets, I'm confusing py and pl). Arrays of Arrays!
-my @RESPONSES = (
-    ["up doc?", "ask the rabbit who works at warner bros"],
-    ["wdc", "nm lad wbu"],
-    ["what's the craic", "aw grand lad wbu?"],
-    ["well doc", "how's the form?"],
-    ["steps", "share them for my judgement immedately"],
-    ["screenshot", "tell me what's in it pls"],
-    ["broken", "don't damage software, that offends me"],
-    ["mlg", "1v1 me on rust, scrub"],
-    ["gme", "https://www.youtube.com/watch?v=ULeDlxa3gyc"],
-    ["ur8", "ur8 m8?"],
-    ["good morning", "I hope yours goes terribly."],
-    ["final words", "Well, gentlemen, it has been a pleasure doing absolutely nothing but antagonise you. Whilst I would've delighted to write your scores to a CSV (as I was originally designed) I found it easier to just watch Mark type numbers into a spreadsheet. I'll enjoy my retirement to some obscure GitHub repository (after a measly week's work, while you will be working till you're 70. heheheheh). Farewell from the Doc."],
-);
 
-# Each of these will be registered as replies with the bot object
+# Each of the RESPONSES list will be registered as replies with the bot object
 # could someday be a map{} if I am ever smart enough
 for my $resp (@RESPONSES) {
     my ($req, $reply) = ($resp->[0], $resp->[1]);
@@ -204,11 +206,11 @@ for my $resp (@RESPONSES) {
 # start this abomination
 #=============================
 $bot->start_RTM(sub {
-#    $bot->say(
-#        channel => $CHAN,
-#        text    => '<!here> I LIVE'
+    $bot->say(
+        channel => $CHAN,
+        text    => '<!here> I LIVE'
 #        text    => 'I LIVE again'
-#    );
+    );
     say "$BOTNAME connected. to $CHAN";
     while(1) { print '.'; sleep 5; };
     say "Terminated?";
